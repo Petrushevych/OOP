@@ -196,6 +196,7 @@ body {
         <tr>
           <th>Volací znak</th>
           <th class="barva-editor" style="display:none;">Barva</th>
+          <th class="teritorium-editor" style="display:none;">Teritorium</th>
           <th>Stav služby</th>
           <th>Přihlášení do služby</th>
         </tr>
@@ -250,6 +251,7 @@ function overitHeslo() {
     prihlaseny = true;
     document.getElementById("heslo-box").style.display = "none";
     document.querySelectorAll(".barva-editor").forEach(el => el.style.display = "table-cell");
+    document.querySelectorAll(".teritorium-editor").forEach(el => el.style.display = "table-cell");
     document.getElementById("admin-controls").style.display = "block";
     zobrazPopup("✅ Přihlášení správce aktivováno", "success");
 
@@ -413,13 +415,8 @@ tr.innerHTML = `
   </td>
   <td class="barva-editor" style="display:none;">
     <select onchange="zmenBarvu(this, '${znak}')">
-      <option value="modra" ${barva === "modra" ? "selected" : ""}>Modrá</option>
-      <option value="cervena" ${barva === "cervena" ? "selected" : ""}>Červená</option>
-      <option value="zluta" ${barva === "zluta" ? "selected" : ""}>Žlutá</option>
-      <option value="fialova" ${barva === "fialova" ? "selected" : ""}>Fialová</option>
-      <option value="zelena" ${barva === "zelena" ? "selected" : ""}>Zelená</option>
-      <option value="oranzova" ${barva === "oranzova" ? "selected" : ""}>Oranžová</option>
-      <option value="ruzova" ${barva === "ruzova" ? "selected" : ""}>Růžová</option>
+      ${["modra","cervena","zluta","fialova","zelena","oranzova","ruzova"].map(b =>
+        `<option value="${b}" ${barva === b ? "selected" : ""}>${b.charAt(0).toUpperCase() + b.slice(1)}</option>`).join("")}
     </select>
   </td>
   <td id="stav-${znak}">Načítám…</td>
@@ -430,6 +427,7 @@ tr.innerHTML = `
     </div>
   </td>
 `;
+
 
     tbody.appendChild(tr);
   }
@@ -447,7 +445,7 @@ tr.innerHTML = `
 db.ref("sluzby").on("value", snapshot => {
   const sluzby = snapshot.val() || {};
   const vsechnyZnaky = Array.from(document.querySelectorAll("#hlidky-tabulka tbody tr"))
-    .map(tr => tr.querySelector("td")?.textContent?.trim())
+    .map(tr => tr.querySelector("td")?.childNodes[0]?.textContent?.trim())
     .filter(Boolean);
 
   for (const znak of vsechnyZnaky) {
